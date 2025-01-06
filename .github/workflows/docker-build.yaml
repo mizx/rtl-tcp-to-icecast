@@ -31,6 +31,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: |
-          ghcr.io/mizx/rtl-tcp-to-icecast:latest
-          ghcr.io/mizx/rtl-tcp-to-icecast:${{ github.sha }}
+        tags: ghcr.io/mizx/rtl-tcp-to-icecast:latest
