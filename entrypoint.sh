@@ -25,7 +25,7 @@ bufferSecs      = ${BUFFER_SECS}
 reconnect       = yes
 
 [input]
-inputfile       = $AUDIO_PIPE
+device          = default
 sampleRate      = ${SAMPLE_RATE_AUDIO}
 bitsPerSample   = ${BITS_PER_SAMPLE}
 channel         = ${CHANNEL}
@@ -44,10 +44,11 @@ EOF
 echo "Generated DarkIce configuration:"
 cat /etc/darkice.cfg
 
-# Start netcat and rtl_fm in the background to write audio to the pipe
+# Start netcat and rtl_fm to process the audio stream
 nc ${RTL_TCP_HOSTNAME} ${RTL_TCP_PORT} | \
 rtl_fm -M fm -s ${SAMPLE_RATE} -f ${FREQUENCY} -g ${GAIN} | \
-sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 1 -V1 - -t wav - rate ${SAMPLE_RATE_AUDIO} > "$AUDIO_PIPE" &
+sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 1 -V1 - -t wav - rate ${SAMPLE_RATE_AUDIO} | \
+arecord -t wav -D default &
 
-# Start DarkIce to read from the pipe
+# Start DarkIce to read from the ALSA device
 darkice -c /etc/darkice.cfg

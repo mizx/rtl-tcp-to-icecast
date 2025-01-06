@@ -1,14 +1,19 @@
 # Use a lightweight Debian base image
-FROM debian:latest
+FROM debian:bullseye-slim
+
+# Update package lists
+RUN apt-get update
 
 # Install required packages
-RUN apt-get update && apt-get install -y \
+RUN apt-get install -y \
     rtl-sdr \
     sox \
     darkice \
     netcat-openbsd \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+    alsa-utils
+
+# Clean up to reduce image size
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Expose port for Icecast streaming
 EXPOSE 8000
