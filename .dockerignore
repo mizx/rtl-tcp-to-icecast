@@ -1,0 +1,5 @@
+# Ignore Git and editor-specific files
+.git
+.gitignore
+*.md
+*.log
