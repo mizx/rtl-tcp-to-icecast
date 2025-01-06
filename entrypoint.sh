@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# List of required environment variables
+required_vars=("ICECAST_SERVER" "ICECAST_PORT" "ICECAST_PASSWORD" "RTL_TCP_SERVER")
+
+# Check if required environment variables are set
+for var in "${required_vars[@]}"; do
+  if [ -z "${!var}" ]; then
+    echo "Error: Required environment variable '$var' is not set."
+    exit 1
+  fi
+done
+
 # Generate DarkIce configuration
 cat <<EOF > /etc/darkice.cfg
 [general]
