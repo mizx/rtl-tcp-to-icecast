@@ -11,6 +11,12 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
+# Create a FIFO (named pipe) for audio data
+AUDIO_PIPE="/tmp/audio_pipe"
+if [ ! -p "$AUDIO_PIPE" ]; then
+  mkfifo "$AUDIO_PIPE"
+fi
+
 # Generate DarkIce configuration
 cat <<EOF > /etc/darkice.cfg
 [general]
@@ -19,7 +25,7 @@ bufferSecs      = ${BUFFER_SECS}
 reconnect       = yes
 
 [input]
-device          = stdin
+device          = $AUDIO_PIPE
 sampleRate      = ${SAMPLE_RATE_AUDIO}
 bitsPerSample   = ${BITS_PER_SAMPLE}
 channel         = ${CHANNEL}
@@ -38,7 +44,9 @@ EOF
 echo "Generated DarkIce configuration:"
 cat /etc/darkice.cfg
 
-# Start RTL-SDR and pipe audio to sox and pipe again to DarkIce
+# Start rtl_sdr and sox in the background to write audio to the pipe
 rtl_sdr -d rtl_tcp=${RTL_TCP_SERVER} -g ${GAIN} -f ${FREQUENCY} -s ${SAMPLE_RATE} | \
-sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 2 -V1 - -t wav - rate ${SAMPLE_RATE_AUDIO} | \
+sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 2 -V1 - -t wav - rate ${SAMPLE_RATE_AUDIO} > "$AUDIO_PIPE" &
+
+# Start DarkIce to read from the pipe
 darkice -c /etc/darkice.cfg
