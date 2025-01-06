@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # List of required environment variables
-required_vars=("ICECAST_SERVER" "ICECAST_PORT" "ICECAST_PASSWORD" "RTL_TCP_SERVER")
+required_vars=("ICECAST_SERVER" "ICECAST_PASSWORD" "RTL_TCP_SERVER")
 
 # Check if required environment variables are set
 for var in "${required_vars[@]}"; do
