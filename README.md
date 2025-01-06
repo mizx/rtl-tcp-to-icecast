@@ -54,6 +54,7 @@ docker run --rm \
 | `ICECAST_SERVER`    | Yes      | None                        | Icecast server address.                                |
 | `ICECAST_PORT`      | No       | `8000`                      | Icecast server port.                                   |
 | `ICECAST_PASSWORD`  | Yes      | None                        | Password for Icecast server.                           |
+| `RTL_TCP_SERVER`    | Yes      | None                        | IP and port of your RTL-TCP server.                    |
 
 ## Building the Image
 
