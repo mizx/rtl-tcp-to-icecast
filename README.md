@@ -39,12 +39,12 @@ docker run --rm \
 
 | Variable            | Required | Default                     | Description                                            |
 |---------------------|----------|-----------------------------|--------------------------------------------------------|
-| `FREQUENCY`         | Yes      | None                        | Frequency to tune to (in Hz).                          |
 | `GAIN`              | No       | `30`                        | Signal gain (in dB).                                   |
 | `SAMPLE_RATE`       | No       | `2400000`                   | RTL-SDR sample rate (in Hz).                           |
 | `BUFFER_SECS`       | No       | `5`                         | Audio buffer size (in seconds).                        |
 | `BITRATE`           | No       | `32`                        | Audio bitrate for Icecast (in kbps).                   |
 | `FORMAT`            | No       | `mp3`                       | Audio format (`mp3`, `ogg`, etc.).                     |
+| `FREQUENCY`         | No       | `155835000`                 | Frequency to tune to (in Hz).                          |
 | `MOUNT_POINT`       | No       | `radio.mp3`                 | Mount point (stream URL path) on Icecast.              |
 | `STREAM_NAME`       | No       | "My ${FREQUENCY} Hz Stream" | Name of the stream displayed on Icecast.               |
 | `DURATION`          | No       | `0`                         | Stream duration in seconds (`0` = unlimited).          |

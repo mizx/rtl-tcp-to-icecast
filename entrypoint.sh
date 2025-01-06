@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Check if FREQUENCY is set
-if [ -z "${FREQUENCY}" ]; then
-  echo "Error: FREQUENCY environment variable is required but not set."
-  echo "Please specify a frequency using the FREQUENCY environment variable."
-  exit 1
-fi
-
 # Generate DarkIce configuration
 cat <<EOF > /etc/darkice.cfg
 [general]
