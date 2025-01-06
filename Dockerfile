@@ -10,6 +10,7 @@ RUN apt-get install -y \
     sox \
     darkice \
     netcat-openbsd \
+    pulseaudio \
     alsa-utils \
     kmod
 

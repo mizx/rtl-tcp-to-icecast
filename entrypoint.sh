@@ -11,9 +11,11 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-# Load ALSA loopback module
-modprobe snd-aloop
-LOOPBACK_DEVICE="hw:Loopback,0,0"
+# Start Pulseaudio in the background
+pulseaudio --start --exit-idle-time=-1
+
+# Create a Pulseaudio null sink (virtual audio device)
+pactl load-module module-null-sink sink_name=VirtualSink
 
 # Generate DarkIce configuration
 cat <<EOF > /etc/darkice.cfg
@@ -23,7 +25,7 @@ bufferSecs      = ${BUFFER_SECS}
 reconnect       = yes
 
 [input]
-device          = $LOOPBACK_DEVICE
+device          = default
 sampleRate      = ${SAMPLE_RATE_AUDIO}
 bitsPerSample   = ${BITS_PER_SAMPLE}
 channel         = ${CHANNEL}
@@ -42,10 +44,10 @@ EOF
 echo "Generated DarkIce configuration:"
 cat /etc/darkice.cfg
 
-# Start netcat and rtl_fm to process the audio stream and write to the loopback device
+# Start netcat and rtl_fm to process the audio stream and write to the Pulseaudio sink
 nc ${RTL_TCP_HOSTNAME} ${RTL_TCP_PORT} | \
 rtl_fm -M fm -s ${SAMPLE_RATE} -f ${FREQUENCY} -g ${GAIN} | \
-sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 1 -V1 - -t alsa $LOOPBACK_DEVICE rate ${SAMPLE_RATE_AUDIO} &
+sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 1 -V1 - -t alsa default rate ${SAMPLE_RATE_AUDIO} &
 
-# Start DarkIce to read from the ALSA loopback device
+# Start DarkIce to read from the Pulseaudio virtual sink
 darkice -c /etc/darkice.cfg
