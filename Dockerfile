@@ -8,9 +8,8 @@ RUN apt-get update
 RUN apt-get install -y \
     rtl-sdr \
     sox \
-    darkice \
+    ezstream \
     netcat-openbsd \
-    pulseaudio \
     alsa-utils \
     kmod
 

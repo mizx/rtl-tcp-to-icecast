@@ -11,43 +11,37 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-# Start Pulseaudio in the background
-pulseaudio --start --exit-idle-time=-1
+# Create a FIFO (named pipe) for audio data
+AUDIO_PIPE="/tmp/audio_pipe"
+if [ ! -p "$AUDIO_PIPE" ]; then
+  mkfifo "$AUDIO_PIPE"
+fi
 
-# Create a Pulseaudio null sink (virtual audio device)
-pactl load-module module-null-sink sink_name=VirtualSink
-
-# Generate DarkIce configuration
-cat <<EOF > /etc/darkice.cfg
-[general]
-duration        = ${DURATION}
-bufferSecs      = ${BUFFER_SECS}
-reconnect       = yes
-
-[input]
-device          = default
-sampleRate      = ${SAMPLE_RATE_AUDIO}
-bitsPerSample   = ${BITS_PER_SAMPLE}
-channel         = ${CHANNEL}
-
-[icecast2-0]
-bitrateMode     = cbr
-format          = ${FORMAT}
-bitrate         = ${BITRATE}
-server          = ${ICECAST_SERVER}
-port            = ${ICECAST_PORT}
-password        = ${ICECAST_PASSWORD}
-mountPoint      = ${MOUNT_POINT}
-name            = "${STREAM_NAME}"
+# Generate Ezstream XML configuration
+cat <<EOF > /etc/ezstream.xml
+<ezstream>
+  <url>http://${ICECAST_SERVER}:${ICECAST_PORT}/radio.mp3</url>
+  <sourcepassword>${ICECAST_PASSWORD}</sourcepassword>
+  <format>MP3</format>
+  <filename>${AUDIO_PIPE}</filename>
+  <bitrate>${BITRATE}</bitrate>
+  <samplerate>${SAMPLE_RATE_AUDIO}</samplerate>
+  <channels>${CHANNEL}</channels>
+  <metadata>
+    <name>${STREAM_NAME}</name>
+    <description>Streaming with Ezstream</description>
+    <genre>Local Radio</genre>
+  </metadata>
+</ezstream>
 EOF
 
-echo "Generated DarkIce configuration:"
-cat /etc/darkice.cfg
+echo "Generated Ezstream configuration:"
+cat /etc/ezstream.xml
 
-# Start netcat and rtl_fm to process the audio stream and write to the Pulseaudio sink
+# Start netcat and rtl_fm to process the audio stream and write to the pipe
 nc ${RTL_TCP_HOSTNAME} ${RTL_TCP_PORT} | \
 rtl_fm -M fm -s ${SAMPLE_RATE} -f ${FREQUENCY} -g ${GAIN} | \
-sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 1 -V1 - -t alsa default rate ${SAMPLE_RATE_AUDIO} &
+sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 1 -V1 - -t mp3 - > "$AUDIO_PIPE" &
 
-# Start DarkIce to read from the Pulseaudio virtual sink
-darkice -c /etc/darkice.cfg
+# Start Ezstream to read from the named pipe and stream to Icecast
+ezstream -c /etc/ezstream.xml
