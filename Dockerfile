@@ -22,6 +22,7 @@ ENV DURATION=0
 ENV SAMPLE_RATE_AUDIO=24000
 ENV BITS_PER_SAMPLE=16
 ENV CHANNEL=1
+ENV ICECAST_PORT=8000
 
 # Copy the entrypoint script
 COPY entrypoint.sh /entrypoint.sh
