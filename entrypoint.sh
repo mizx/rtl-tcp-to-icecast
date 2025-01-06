@@ -11,11 +11,9 @@ for var in "${required_vars[@]}"; do
   fi
 done
 
-# Create a FIFO (named pipe) for audio data
-AUDIO_PIPE="/tmp/audio_pipe"
-if [ ! -p "$AUDIO_PIPE" ]; then
-  mkfifo "$AUDIO_PIPE"
-fi
+# Load ALSA loopback module
+modprobe snd-aloop
+LOOPBACK_DEVICE="hw:Loopback,0,0"
 
 # Generate DarkIce configuration
 cat <<EOF > /etc/darkice.cfg
@@ -25,7 +23,7 @@ bufferSecs      = ${BUFFER_SECS}
 reconnect       = yes
 
 [input]
-device          = default
+device          = $LOOPBACK_DEVICE
 sampleRate      = ${SAMPLE_RATE_AUDIO}
 bitsPerSample   = ${BITS_PER_SAMPLE}
 channel         = ${CHANNEL}
@@ -44,11 +42,10 @@ EOF
 echo "Generated DarkIce configuration:"
 cat /etc/darkice.cfg
 
-# Start netcat and rtl_fm to process the audio stream
+# Start netcat and rtl_fm to process the audio stream and write to the loopback device
 nc ${RTL_TCP_HOSTNAME} ${RTL_TCP_PORT} | \
 rtl_fm -M fm -s ${SAMPLE_RATE} -f ${FREQUENCY} -g ${GAIN} | \
-sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 1 -V1 - -t wav - rate ${SAMPLE_RATE_AUDIO} | \
-arecord -t wav -D default &
+sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 1 -V1 - -t alsa $LOOPBACK_DEVICE rate ${SAMPLE_RATE_AUDIO} &
 
-# Start DarkIce to read from the ALSA device
+# Start DarkIce to read from the ALSA loopback device
 darkice -c /etc/darkice.cfg

@@ -10,7 +10,8 @@ RUN apt-get install -y \
     sox \
     darkice \
     netcat-openbsd \
-    alsa-utils
+    alsa-utils \
+    kmod
 
 # Clean up to reduce image size
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
