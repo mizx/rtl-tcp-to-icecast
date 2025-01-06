@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # List of required environment variables
-required_vars=("ICECAST_SERVER" "ICECAST_PASSWORD" "RTL_TCP_SERVER")
+required_vars=("ICECAST_SERVER" "ICECAST_PASSWORD" ""RTL_TCP_HOSTNAME"")
 
 # Check if required environment variables are set
 for var in "${required_vars[@]}"; do
@@ -44,9 +44,10 @@ EOF
 echo "Generated DarkIce configuration:"
 cat /etc/darkice.cfg
 
-# Start rtl_sdr and sox in the background to write audio to the pipe
-rtl_sdr -d rtl_tcp=${RTL_TCP_SERVER} -g ${GAIN} -f ${FREQUENCY} -s ${SAMPLE_RATE} | \
-sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 2 -V1 - -t wav - rate ${SAMPLE_RATE_AUDIO} > "$AUDIO_PIPE" &
+# Start netcat and rtl_fm in the background to write audio to the pipe
+nc ${RTL_TCP_HOSTNAME} ${RTL_TCP_PORT} | \
+rtl_fm -M fm -s ${SAMPLE_RATE} -f ${FREQUENCY} -g ${GAIN} | \
+sox -t raw -r ${SAMPLE_RATE} -e signed -b 16 -c 1 -V1 - -t wav - rate ${SAMPLE_RATE_AUDIO} > "$AUDIO_PIPE" &
 
 # Start DarkIce to read from the pipe
 darkice -c /etc/darkice.cfg

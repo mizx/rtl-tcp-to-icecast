@@ -32,6 +32,8 @@ docker run --rm \
   -e ICECAST_SERVER=192.168.1.100 \
   -e ICECAST_PORT=8000 \
   -e ICECAST_PASSWORD=hackme \
+  -e RTL_TCP_HOSTNAME=192.168.1.100 \
+  -e RTL_TCP_PORT=1234 \
   mizx/rtl-tcp-to-icecast
 ```
 
@@ -54,7 +56,8 @@ docker run --rm \
 | `ICECAST_SERVER`    | Yes      | None                        | Icecast server address.                                |
 | `ICECAST_PORT`      | No       | `8000`                      | Icecast server port.                                   |
 | `ICECAST_PASSWORD`  | Yes      | None                        | Password for Icecast server.                           |
-| `RTL_TCP_SERVER`    | Yes      | None                        | IP and port of your RTL-TCP server.                    |
+| `RTL_TCP_HOSTNAME`  | Yes      | None                        | Hostname or IP of the RTL-TCP server.                  |
+| `RTL_TCP_PORT`      | No       | 1234                         | Port of the RTL-TCP server.                            |
 
 ## Building the Image
 
