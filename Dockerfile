@@ -1,10 +1,14 @@
 # Use a lightweight Debian base image
 FROM debian:latest
 
-# Install dependencies: rtl-sdr, sox, darkice, gettext-base (for envsubst)
-RUN apt-get update && \
-    apt-get install -y rtl-sdr sox darkice gettext-base && \
-    apt-get clean
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    rtl-sdr \
+    sox \
+    darkice \
+    netcat-openbsd \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # Expose port for Icecast streaming
 EXPOSE 8000
