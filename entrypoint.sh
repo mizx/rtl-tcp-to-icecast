@@ -25,7 +25,7 @@ bufferSecs      = ${BUFFER_SECS}
 reconnect       = yes
 
 [input]
-device          = $AUDIO_PIPE
+inputfile       = $AUDIO_PIPE
 sampleRate      = ${SAMPLE_RATE_AUDIO}
 bitsPerSample   = ${BITS_PER_SAMPLE}
 channel         = ${CHANNEL}
