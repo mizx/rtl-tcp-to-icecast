@@ -20,19 +20,28 @@ fi
 # Generate Ezstream XML configuration
 cat <<EOF > /etc/ezstream.xml
 <ezstream>
-  <url>http://${ICECAST_SERVER}:${ICECAST_PORT}/radio.mp3</url>
+  <!-- Icecast server details -->
+  <url>http://${ICECAST_SERVER}:${ICECAST_PORT}/${MOUNT_POINT}</url>
   <sourcepassword>${ICECAST_PASSWORD}</sourcepassword>
-  <format>MP3</format>
-  <filename>${AUDIO_PIPE}</filename>
+
+  <!-- Stream format and input -->
+  <format>${FORMAT}</format>
+  <filename>-</filename> <!-- Read from stdin -->
+  <encoding>raw</encoding>
   <bitrate>${BITRATE}</bitrate>
-  <samplerate>${SAMPLE_RATE_AUDIO}</samplerate>
-  <channels>${CHANNEL}</channels>
-  <metadata>
-    <name>${STREAM_NAME}</name>
-    <description>Streaming with Ezstream</description>
-    <genre>Local Radio</genre>
-  </metadata>
+
+  <!-- Stream metadata -->
+  <svrinfoname>${STREAM_NAME}</svrinfoname>
+  <svrinfourl>http://${ICECAST_SERVER}</svrinfourl>
+  <svrinfogenre>Kitsap Radio</svrinfogenre>
+  <svrinfodescription>Live stream at ${FREQUENCY} Hz</svrinfodescription>
+  <svrinfobitrate>${BITRATE}</svrinfobitrate>
+  <svrinfochannels>${CHANNEL}</svrinfochannels>
+  <svrinfosamplerate>${SAMPLE_RATE_AUDIO}</svrinfosamplerate>
+  <svrinfopublic>1</svrinfopublic>
 </ezstream>
+
+
 EOF
 
 echo "Generated Ezstream configuration:"
